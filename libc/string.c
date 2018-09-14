@@ -2,12 +2,6 @@
 #include <stddef.h>
 #include <string.h>
 
-static inline __attribute__((noreturn)) void IMPL_ME() {
-	extern void hal_halt(void);
-	hal_halt();
-	while(1);
-}
-
 int strcmp(const char *s1, const char *s2) {
 	const char *p1 = s1;
 	const char *p2 = s2;
