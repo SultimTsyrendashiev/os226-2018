@@ -107,6 +107,29 @@ static const struct cpio_old_hdr *find_exe(char *name) {
 	return found;
 }
 
+void *oalloc(size_t size)
+{
+	kernel_globals.mem = (char*)(kernel_globals.mem) + size;
+
+	kernel_globals.sizes[kernel_globals.stackPtr] = size;
+	kernel_globals.stackPtr++;
+
+	return kernel_globals.mem;
+}
+
+void ofree()
+{
+	if (kernel_globals.stackPtr == 0)
+	{
+		return;
+	}
+
+	kernel_globals.stackPtr--;
+	int size = kernel_globals.sizes[kernel_globals.stackPtr];
+
+	kernel_globals.mem = (char*)(kernel_globals.mem) - size;
+}
+
 void *load(char *name, void **entry) {
 	const struct cpio_old_hdr *ch = find_exe(name);
 	if (!ch) {
@@ -116,13 +139,27 @@ void *load(char *name, void **entry) {
 	// http://www.sco.com/developers/gabi/latest/contents.html
 	const char *rawelf = cpio_content(ch);
 
-	// IMPL ME
-	rawelf = rawelf;
-	return NULL;
+	Elf64_Ehdr *elfHeader = (Elf64_Ehdr*)rawelf;
+	Elf64_Phdr *programHeader = (Elf64_Phdr*)(rawelf + elfHeader->e_phoff);
+
+	void *allocated = oalloc(programHeader->p_memsz);
+
+	for (int i = 0; i < elfHeader->e_phnum ; i++)
+	{
+		if (programHeader->p_type == PT_LOAD)
+		{
+			memcpy((char*)allocated + programHeader->p_vaddr, rawelf + programHeader->p_offset, programHeader->p_filesz);
+		}
+
+		programHeader = (Elf64_Phdr*)((char*)programHeader + elfHeader->e_phentsize);
+	}
+
+	*entry = (char*)allocated + elfHeader->e_entry;
+	return allocated;
 }
 
 void unload(void *mark) {
-	// IMPL ME
+	ofree();
 }
 
 static void tramprun(unsigned long *args) {
