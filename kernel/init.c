@@ -11,7 +11,6 @@ void kernel_init(void *rootfs_cpio, void *mem, size_t sz, const char* args) {
 	kernel_globals.rootfs_cpio = rootfs_cpio;
 	kernel_globals.mem = mem;
 	kernel_globals.memsz = sz;
-	kernel_globals.stackPtr = 0;
 }
 
 void kernel_start(void) {
