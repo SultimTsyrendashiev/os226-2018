@@ -255,6 +255,12 @@ failload:
 }
 
 int sys_run(struct context *ctx, char *argv[], int *code) {
+	
+	if (argv == NULL)
+	{
+		argv = get_task();
+	}
+
 	if (!argv[0]) {
 		return -1;
 	}
@@ -345,4 +351,57 @@ int sys_read(struct context *ctx, int f, void *buf, size_t sz) {
 int sys_write(struct context *ctx, int f, const void *buf, size_t sz) {
 	dbg_out(buf, sz);
 	return 0;
+}
+
+int sys_add_task(struct context *ctx, char *argv[])
+{
+	int allocated_size = 128 * sizeof(char);
+
+	char *new_argv = (char*)alloc(allocated_size);
+	memcpy((void*)new_argv, (void*)argv, allocated_size);
+
+	for (int i = 0; i < TASKS_SIZE; i++)
+	{
+		if (kernel_globals.task_list[i] == NULL)
+		{
+			kernel_globals.task_list[i] = (char**)new_argv;
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
+char **get_task()
+{
+	char **argv = NULL;
+
+	int max_priority = -1;
+	int i_max_priority = -1;
+
+	for (int i = 0; i < TASKS_SIZE; i++)
+	{
+		if (kernel_globals.task_list[i] != NULL)
+		{
+			// first word in arguments is priority
+			int priority = atoi(kernel_globals.task_list[i][0]);
+
+			if (priority > max_priority)
+			{
+				max_priority = priority;
+				i_max_priority = i;
+
+				// argv without priority
+				argv = kernel_globals.task_list[i] + 1;
+			}
+		}
+	}
+
+	// remove from list
+	if (i_max_priority != -1)
+	{
+		kernel_globals.task_list[i_max_priority] = NULL;
+	}
+
+	return argv;
 }

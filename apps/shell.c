@@ -33,11 +33,19 @@ int main(int argc, char *argv[]) {
 			}
 			argv[argc] = NULL;
 
-			if (!argc) {
-				break;
+			if (strcmp(argv[0], "execute") == 0)
+			{
+				os_run(NULL, NULL);
+			}
+			else
+			{
+				if (!argc) {
+					break;
+				}
+
+				os_add_task(argv);
 			}
 
-			os_run(argv, NULL);
 			cmd = strtok_r(NULL, comsep, &stcmd);
 		}
 	}

@@ -11,6 +11,11 @@ void kernel_init(void *rootfs_cpio, void *mem, size_t sz, const char* args) {
 	kernel_globals.rootfs_cpio = rootfs_cpio;
 	kernel_globals.mem = mem;
 	kernel_globals.memsz = sz;
+
+	for (int i = 0; i < TASKS_SIZE; i++)
+	{
+		kernel_globals.task_list[i] = NULL;
+	}
 }
 
 void kernel_start(void) {
