@@ -98,3 +98,25 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 	}
 	return 0;
 }
+
+int atoi(char *s)
+{
+	int result = 0;
+	int i = 0;
+
+	while (1)
+	{
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			result = result * 10 + (s[i] - '0');
+		}
+		else
+		{
+			break;
+		}
+
+		i++;
+	}
+
+	return result;
+}
