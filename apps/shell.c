@@ -33,19 +33,16 @@ int main(int argc, char *argv[]) {
 			}
 			argv[argc] = NULL;
 
-			if (strcmp(argv[0], "execute") == 0)
-			{
-				os_run(NULL, NULL);
-			}
-			else
-			{
-				if (!argc) {
-					break;
-				}
-
-				os_add_task(argv);
+			if (!argc) {
+				break;
 			}
 
+			int p = os_run(argv);
+			if (0 <= p) {
+				os_wait(p);
+			} else {
+				rprintf("error on running \"%s\"\n", argv[0]);
+			}
 			cmd = strtok_r(NULL, comsep, &stcmd);
 		}
 	}

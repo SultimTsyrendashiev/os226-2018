@@ -22,4 +22,5 @@ void *memcpy(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 
-int atoi(char *s);
+long int strtol(const char *nptr, char **endptr, int base);
+
